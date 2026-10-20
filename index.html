@@ -1,0 +1,3088 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>1860 Cafe Jovelicious — Restaurant Ordering System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --paper: #EDE8DD;
+            --paper-dark: #E2DBC9;
+            --ink: #1F2421;
+            --ink-soft: #3A3F3B;
+            --steel: #4A5A6A;
+            --steel-dark: #354250;
+            --orange: #E8622C;
+            --orange-dark: #C64F20;
+            --grease: #6B6862;
+            --line: #C9C1AD;
+            --paper-white: #F7F4EC;
+            --rust: #8C3B2E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
+        /* =========================
+   NAVBAR
+========================= */
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            height: 76px;
+
+            background: var(--paper-white);
+            border-bottom: 2px solid var(--ink);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--orange);
+            color: white;
+
+            font-family: 'Oswald', sans-serif;
+            font-size: 23px;
+            font-weight: 700;
+
+            border: 2px solid var(--ink);
+        }
+
+        .logo-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo-sub {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            color: var(--grease);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .nav-links a:hover {
+            color: var(--orange);
+        }
+
+        .cart-nav {
+            background: var(--ink);
+            color: white !important;
+
+            padding: 12px 18px;
+
+            border: 2px solid var(--ink);
+        }
+
+        .cart-nav:hover {
+            background: var(--orange);
+            color: white !important;
+        }
+
+        .menu-btn {
+            display: none;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        /* =========================
+   HERO
+========================= */
+
+        .hero {
+            min-height: 600px;
+
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+
+            gap: 60px;
+
+            padding: 80px 8%;
+
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-kicker {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--orange);
+            font-weight: 600;
+
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Oswald', sans-serif;
+
+            font-size: clamp(55px, 8vw, 105px);
+
+            line-height: 0.88;
+
+            text-transform: uppercase;
+
+            margin-bottom: 28px;
+        }
+
+        .hero h1 span {
+            color: var(--orange);
+        }
+
+        .hero-description {
+            max-width: 570px;
+
+            font-size: 16px;
+            line-height: 1.7;
+
+            color: var(--ink-soft);
+
+            margin-bottom: 35px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 23px;
+
+            border: 2px solid var(--ink);
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+        }
+
+        .btn-secondary:hover {
+            background: var(--ink);
+            color: white;
+        }
+
+        /* =========================
+   ORDER RECEIPT
+========================= */
+
+        .receipt {
+            align-self: center;
+
+            background: var(--paper-white);
+
+            border: 2px solid var(--ink);
+
+            box-shadow: 12px 12px 0 var(--steel);
+
+            padding: 30px;
+
+            transform: rotate(1deg);
+        }
+
+        .receipt-header {
+            text-align: center;
+
+            border-bottom: 2px dashed var(--ink);
+
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+        }
+
+        .receipt-small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--grease);
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+
+            margin: 12px 0;
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+        }
+
+        .receipt-status {
+            display: inline-block;
+
+            background: var(--orange);
+            color: white;
+
+            padding: 5px 8px;
+
+            font-size: 9px;
+        }
+
+        .receipt-total {
+            border-top: 2px dashed var(--ink);
+
+            padding-top: 16px;
+            margin-top: 18px;
+
+            display: flex;
+            justify-content: space-between;
+
+            font-family: 'Oswald', sans-serif;
+            font-size: 25px;
+        }
+
+        /* =========================
+   SECTION
+========================= */
+
+        .section {
+            padding: 80px 8%;
+
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+
+            margin-bottom: 35px;
+        }
+
+        .section-kicker {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--orange);
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        .section h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 55px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        /* =========================
+   CATEGORY
+========================= */
+
+        .categories {
+            display: flex;
+            gap: 10px;
+
+            margin-bottom: 35px;
+
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 17px;
+
+            border: 2px solid var(--ink);
+
+            background: transparent;
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+
+            cursor: pointer;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: var(--ink);
+            color: white;
+        }
+
+        /* =========================
+   MENU GRID
+========================= */
+
+        .menu-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 20px;
+        }
+
+        .food-card {
+            background: var(--paper-white);
+
+            border: 2px solid var(--ink);
+
+            transition: 0.2s;
+
+            overflow: hidden;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 7px 7px 0 var(--steel);
+        }
+
+        .food-card.out-of-stock {
+            opacity: 0.55;
+        }
+
+        .food-image {
+            height: 190px;
+
+            background: var(--paper-dark);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+
+            font-size: 75px;
+
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            font-weight: 600;
+
+            padding: 5px 8px;
+
+            background: var(--steel);
+            color: white;
+        }
+
+        .stock-badge.low {
+            background: var(--orange);
+        }
+
+        .stock-badge.out {
+            background: #8C3B2E;
+        }
+
+        .food-info {
+            padding: 20px;
+        }
+
+        .food-category {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--orange);
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 7px;
+        }
+
+        .food-name {
+            font-family: 'Oswald', sans-serif;
+
+            font-size: 27px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .food-description {
+            font-size: 12px;
+
+            color: var(--grease);
+
+            line-height: 1.5;
+
+            min-height: 38px;
+
+            margin-bottom: 18px;
+        }
+
+        .food-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .food-price {
+            font-family: 'Oswald', sans-serif;
+            font-size: 25px;
+        }
+
+        .add-btn {
+            background: var(--orange);
+            color: white;
+
+            border: 2px solid var(--ink);
+
+            padding: 10px 14px;
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 10px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background: var(--orange-dark);
+        }
+
+        .add-btn:disabled {
+            background: var(--grease);
+            border-color: var(--grease);
+            cursor: not-allowed;
+        }
+
+        /* =========================
+   ORDER SECTION
+========================= */
+
+        .order-layout {
+            display: grid;
+
+            grid-template-columns: 1fr 380px;
+
+            gap: 30px;
+
+            align-items: start;
+        }
+
+        .order-box {
+            background: var(--paper-white);
+
+            border: 2px solid var(--ink);
+
+            padding: 25px;
+        }
+
+        .order-box h3 {
+            font-family: 'Oswald', sans-serif;
+
+            font-size: 30px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 20px;
+        }
+
+        /* CART */
+
+        .cart-item {
+            display: grid;
+
+            grid-template-columns: 1fr auto auto;
+
+            gap: 15px;
+
+            align-items: center;
+
+            padding: 17px 0;
+
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .cart-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+        }
+
+        .cart-price {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 27px;
+            height: 27px;
+
+            border: 1px solid var(--ink);
+
+            background: var(--paper);
+
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            background: none;
+
+            border: none;
+
+            color: var(--orange);
+
+            cursor: pointer;
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+        }
+
+        .empty-cart {
+            padding: 50px 20px;
+
+            text-align: center;
+
+            color: var(--grease);
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 12px;
+        }
+
+        /* CART REQUEST NOTE */
+
+        .cart-request-group {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--ink);
+        }
+
+        .cart-request-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* =========================
+   CHECKOUT
+========================= */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+
+            padding: 13px;
+
+            background: var(--paper);
+
+            border: 2px solid var(--ink);
+
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--orange);
+        }
+
+        .radio-group {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 10px;
+        }
+
+        .radio-option {
+            border: 2px solid var(--ink);
+
+            padding: 13px;
+
+            cursor: pointer;
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 10px;
+
+            text-align: center;
+        }
+
+        .radio-option input {
+            margin-right: 6px;
+        }
+
+        .radio-option:has(input:checked) {
+            background: var(--ink);
+            color: white;
+        }
+
+        .order-total {
+            display: flex;
+
+            justify-content: space-between;
+
+            border-top: 2px solid var(--ink);
+
+            padding-top: 18px;
+
+            margin-top: 20px;
+
+            font-family: 'Oswald', sans-serif;
+
+            font-size: 28px;
+        }
+
+        .place-order {
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 17px;
+
+            background: var(--orange);
+
+            color: white;
+
+            border: 2px solid var(--ink);
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .place-order:hover {
+            background: var(--orange-dark);
+        }
+
+        /* =========================
+   CONFIRMATION
+========================= */
+
+        .confirmation {
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(31, 36, 33, 0.75);
+
+            z-index: 2000;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .confirmation.show {
+            display: flex;
+        }
+
+        .confirmation-box {
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+
+            background: var(--paper-white);
+
+            border: 3px solid var(--ink);
+
+            box-shadow: 10px 10px 0 var(--orange);
+
+            padding: 35px;
+
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            font-size: 55px;
+
+            margin-bottom: 10px;
+        }
+
+        .confirmation-box h2 {
+            font-family: 'Oswald', sans-serif;
+
+            font-size: 45px;
+
+            text-transform: uppercase;
+        }
+
+        .order-number {
+            font-family: 'IBM Plex Mono', monospace;
+
+            background: var(--paper-dark);
+
+            border: 2px dashed var(--ink);
+
+            padding: 15px;
+
+            margin: 20px 0;
+
+            font-size: 18px;
+
+            font-weight: 600;
+        }
+
+        .confirmation-items {
+            text-align: left;
+
+            margin: 20px 0;
+
+            border-top: 2px dashed var(--ink);
+            border-bottom: 2px dashed var(--ink);
+
+            padding: 16px 0;
+        }
+
+        .confirmation-items-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--grease);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .confirmation-item-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+
+            padding: 6px 0;
+        }
+
+        .confirmation-item-row span:first-child {
+            color: var(--ink-soft);
+        }
+
+        .confirmation-item-row span:last-child {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .confirmation-details {
+            text-align: left;
+
+            margin: 20px 0;
+        }
+
+        .confirmation-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 8px 0;
+
+            border-bottom: 1px dashed var(--line);
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 11px;
+        }
+
+        /* =========================
+   FOOTER
+========================= */
+
+        footer {
+            background: var(--ink);
+
+            color: white;
+
+            padding: 45px 8%;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 30px;
+
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            font-family: 'Oswald', sans-serif;
+
+            font-size: 30px;
+        }
+
+        .footer-text {
+            color: #B9B9B0;
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 10px;
+
+            line-height: 1.7;
+        }
+
+        .footer-right {
+            text-align: right;
+
+            font-family: 'IBM Plex Mono', monospace;
+
+            font-size: 10px;
+
+            color: #B9B9B0;
+        }
+
+
+        /* =========================
+           ORDER TRACKING
+        ========================= */
+        .tracking-section {
+            background: var(--ink);
+            color: white;
+        }
+
+        .tracking-section .section-kicker,
+        .tracking-section h2 {
+            color: white;
+        }
+
+        .tracking-section .tracking-sub {
+            color: #B9B9B0;
+            max-width: 650px;
+            margin-top: 10px;
+        }
+
+        .track-search {
+            display: flex;
+            gap: 10px;
+            max-width: 650px;
+            margin-top: 25px;
+        }
+
+        .track-search input {
+            flex: 1;
+            min-width: 0;
+            padding: 15px;
+            background: #2A2E2A;
+            color: white;
+            border: 2px solid #5A5F58;
+            font-family: 'IBM Plex Mono', monospace;
+            outline: none;
+        }
+
+        .track-search input:focus {
+            border-color: var(--orange);
+        }
+
+        .track-result {
+            display: none;
+            margin-top: 30px;
+            max-width: 760px;
+            background: var(--paper-white);
+            color: var(--ink);
+            border: 2px solid white;
+            padding: 25px;
+            box-shadow: 8px 8px 0 var(--orange);
+        }
+
+        .track-result.show {
+            display: block;
+        }
+
+        .track-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px dashed var(--line);
+            padding-bottom: 16px;
+            margin-bottom: 25px;
+        }
+
+        .track-order-number {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+        }
+
+        .track-status {
+            padding: 7px 12px;
+            background: var(--orange);
+            color: white;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .track-status.cancelled {
+            background: var(--rust);
+        }
+
+        .track-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .track-meta-box {
+            border: 1px solid var(--line);
+            padding: 12px;
+        }
+
+        .track-meta-box span {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            color: var(--grease);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .track-meta-box strong {
+            font-size: 13px;
+        }
+
+        .track-timeline {
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .track-step {
+            display: flex;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 25px;
+        }
+
+        .track-step:last-child {
+            padding-bottom: 0;
+        }
+
+        .track-step::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 18px;
+            bottom: 0;
+            width: 2px;
+            background: var(--line);
+        }
+
+        .track-step:last-child::before {
+            display: none;
+        }
+
+        .track-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--line);
+            background: var(--paper-white);
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .track-step.done .track-dot,
+        .track-step.active .track-dot {
+            background: var(--orange);
+            border-color: var(--orange);
+        }
+
+        .track-step.cancelled-step .track-dot {
+            background: var(--rust);
+            border-color: var(--rust);
+        }
+
+        .track-step-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 17px;
+        }
+
+        .track-step-time {
+            color: var(--grease);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .cancel-order-btn {
+            margin-top: 22px;
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            color: var(--rust);
+            border: 2px solid var(--rust);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .cancel-order-btn:hover {
+            background: var(--rust);
+            color: white;
+        }
+
+        .cancel-order-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .track-message {
+            display: none;
+            margin-top: 20px;
+            padding: 14px;
+            border: 2px dashed var(--line);
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+        }
+
+        .track-message.show {
+            display: block;
+        }
+
+        @media (max-width: 650px) {
+            .track-search {
+                flex-direction: column;
+            }
+
+            .track-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =========================
+   RESPONSIVE
+========================= */
+
+        .option-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2500;
+            background: rgba(31, 36, 33, .75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px
+        }
+
+        .option-modal.show {
+            display: flex
+        }
+
+        .option-modal-box {
+            width: 100%;
+            max-width: 430px;
+            background: var(--paper-white);
+            border: 3px solid var(--ink);
+            box-shadow: 8px 8px 0 var(--orange);
+            padding: 28px
+        }
+
+        .option-modal-box h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 32px;
+            text-transform: uppercase;
+            margin-bottom: 6px
+        }
+
+        .option-modal-sub {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--grease);
+            margin-bottom: 20px
+        }
+
+        .option-group {
+            margin-bottom: 18px
+        }
+
+        .option-group-label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 8px
+        }
+
+        .option-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 9px
+        }
+
+        .option-btn {
+            border: 2px solid var(--ink);
+            background: transparent;
+            padding: 12px 10px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px
+        }
+
+        .option-btn.selected,
+        .option-btn:hover {
+            background: var(--ink);
+            color: white
+        }
+
+        .option-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px
+        }
+
+        .option-modal-actions button {
+            flex: 1
+        }
+
+        .option-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .option-btn:disabled:hover {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .option-btn small {
+            font-size: 8px;
+            color: var(--rust);
+        }
+
+        @media (max-width: 900px) {
+
+            .hero {
+                grid-template-columns: 1fr;
+
+                padding: 60px 6%;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .order-layout {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                padding: 0 5%;
+            }
+
+            .nav-links {
+                display: none;
+
+                position: absolute;
+
+                top: 76px;
+                left: 0;
+                right: 0;
+
+                background: var(--paper-white);
+
+                border-bottom: 2px solid var(--ink);
+
+                padding: 20px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 50px 5%;
+            }
+
+            .hero h1 {
+                font-size: 60px;
+            }
+
+            .section {
+                padding: 60px 5%;
+            }
+
+            .section h2 {
+                font-size: 43px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .receipt {
+                transform: none;
+            }
+
+            .cart-item {
+                grid-template-columns: 1fr;
+            }
+
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-right {
+                text-align: left;
+            }
+
+        }
+
+        .logo-text,
+        .side-logo-text,
+        .auth-logo-text {
+            font-size: 15px;
+            line-height: 1.1;
+        }
+
+        .footer-brand {
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+     NAVBAR
+========================= -->
+
+    <nav class="navbar">
+
+        <a href="#" class="logo">
+
+            <div class="logo-mark">
+                J
+            </div>
+
+            <div>
+                <div class="logo-text">1860 CAFE JOVELICIOUS</div>
+
+                <div class="logo-sub">
+                    RESTAURANT ORDERING
+                </div>
+            </div>
+
+        </a>
+
+        <ul class="nav-links" id="navLinks">
+
+            <li>
+                <a href="#menu">
+                    Menu
+                </a>
+            </li>
+
+            <li>
+                <a href="#order">
+                    Order
+                </a>
+            </li>
+
+            <li>
+                <a href="#track">
+                    Track
+                </a>
+            </li>
+
+            <li>
+                <a href="#order" class="cart-nav">
+                    Cart (<span id="cartCount">0</span>)
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="menu-btn" id="menuBtn">
+            ☰
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+     HERO
+========================= -->
+
+    <section class="hero">
+
+        <div class="hero-left">
+
+            <div class="hero-kicker">
+                // FRESHLY MADE — DINE-IN, TAKEOUT & PICKUP
+            </div>
+
+            <h1>
+                GOOD FOOD.<br>
+                EASY<br>
+                <span>ORDERING.</span>
+            </h1>
+
+            <p class="hero-description">
+
+                Browse our menu, choose your favorites,
+                select dine-in, takeout, or pick-up at the
+                counter, and place your order in just a few
+                clicks.
+
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#menu" class="btn btn-primary">
+                    ORDER NOW →
+                </a>
+
+                <a href="#menu" class="btn btn-secondary">
+                    VIEW MENU
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECEIPT -->
+
+        <div class="receipt">
+
+            <div class="receipt-header">
+
+                <div class="receipt-title">1860 CAFE JOVELICIOUS</div>
+
+                <div class="receipt-small">
+                    SAMPLE ORDER
+                </div>
+
+            </div>
+
+            <div class="receipt-row">
+                <span>ORDER</span>
+                <strong>#KL-08231</strong>
+            </div>
+
+            <div class="receipt-row">
+                <span>TYPE</span>
+                <strong>DINE-IN</strong>
+            </div>
+
+            <div class="receipt-row">
+                <span>STATUS</span>
+
+                <span class="receipt-status">
+                    PREPARING
+                </span>
+            </div>
+
+            <br>
+
+            <div class="receipt-row">
+                <span>Chicken Meal x2</span>
+                <span>₱240</span>
+            </div>
+
+            <div class="receipt-row">
+                <span>Iced Tea x2</span>
+                <span>₱90</span>
+            </div>
+
+            <div class="receipt-row">
+                <span>Fries x1</span>
+                <span>₱65</span>
+            </div>
+
+            <div class="receipt-total">
+                <span>TOTAL</span>
+                <span>₱395</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+     MENU
+========================= -->
+
+    <section class="section" id="menu">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-kicker">
+                    // OUR MENU
+                </div>
+
+                <h2>
+                    CHOOSE<br>
+                    YOUR FOOD
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- CATEGORIES -->
+
+        <div class="categories" id="categoryBar">
+
+            <button class="category-btn active" onclick="filterMenu('All', this)">
+                All
+            </button>
+
+        </div>
+
+
+        <!-- MENU ITEMS -->
+
+        <div class="menu-grid" id="menuGrid"></div>
+
+    </section>
+
+
+    <!-- =========================
+     ORDER
+========================= -->
+
+    <section class="section" id="order">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-kicker">
+                    // YOUR ORDER
+                </div>
+
+                <h2>
+                    CHECKOUT
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="order-layout">
+
+
+            <!-- CART -->
+
+            <div class="order-box">
+
+                <h3>
+                    ORDER ITEMS
+                </h3>
+
+                <div id="cartItems">
+
+                    <div class="empty-cart">
+                        YOUR CART IS EMPTY.<br>
+                        ADD SOMETHING DELICIOUS.
+                    </div>
+
+                </div>
+
+                <div class="cart-request-group">
+                    <label class="form-label" for="orderRequest">Special Request (Optional)</label>
+                    <textarea id="orderRequest" class="form-input"
+                        placeholder="e.g. no onions, extra spicy, less ice..."></textarea>
+                </div>
+
+            </div>
+
+
+            <!-- CHECKOUT -->
+
+            <div class="order-box">
+
+                <h3>
+                    ORDER DETAILS
+                </h3>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Customer Name
+                    </label>
+
+                    <input type="text" id="customerName" class="form-input" placeholder="Enter your name">
+
+                </div>
+
+
+                <!-- ORDER TYPE -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Order Type
+                    </label>
+
+                    <div class="radio-group">
+
+                        <label class="radio-option">
+
+                            <input type="radio" name="orderType" value="Dine-in" checked>
+
+                            Dine-in
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input type="radio" name="orderType" value="Takeout">
+
+                            Takeout
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input type="radio" name="orderType" value="Pickup">
+
+                            Pick-up at Counter
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TABLE -->
+
+                <div class="form-group" id="tableGroup">
+
+                    <label class="form-label">
+                        Table Number
+                    </label>
+
+                    <select id="tableNumber" class="form-select">
+
+                        <option value="">
+                            Select table
+                        </option>
+
+                        <option value="Table 01">
+                            Table 01
+                        </option>
+
+                        <option value="Table 02">
+                            Table 02
+                        </option>
+
+                        <option value="Table 03">
+                            Table 03
+                        </option>
+
+                        <option value="Table 04">
+                            Table 04
+                        </option>
+
+                        <option value="Table 05">
+                            Table 05
+                        </option>
+
+                        <option value="Table 06">
+                            Table 06
+                        </option>
+
+                        <option value="Table 07">
+                            Table 07
+                        </option>
+
+                        <option value="Table 08">
+                            Table 08
+                        </option>
+
+                        <option value="Table 09">
+                            Table 09
+                        </option>
+
+                        <option value="Table 10">
+                            Table 10
+                        </option>
+
+                    </select>
+
+                </div>
+                <!-- PAYMENT -->
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Payment Method
+                    </label>
+
+                    <div class="radio-option" style="background: var(--ink); color: white;">
+                        💵 Cash
+                    </div>
+                </div>
+
+                <div class="order-total">
+
+                    <span>
+                        TOTAL
+                    </span>
+
+                    <span id="cartTotal">
+                        ₱0
+                    </span>
+
+                </div>
+
+
+                <button class="place-order" onclick="placeOrder()">
+                    PLACE ORDER →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+     ORDER TRACKING
+========================= -->
+    <section class="section tracking-section" id="track">
+        <div class="section-header">
+            <div>
+                <div class="section-kicker">// LIVE ORDER TRACKING</div>
+                <h2>TRACK ORDER</h2>
+                <p class="tracking-sub">
+                    Enter your order number to see the latest status. The status updates automatically when staff
+                    changes
+                    the order in the admin panel.
+                </p>
+            </div>
+        </div>
+
+        <div class="track-search">
+            <input type="text" id="trackOrderInput" placeholder="e.g. KL-12345" autocomplete="off">
+            <input type="text" id="trackNameInput" placeholder="Name used on the order" autocomplete="off">
+            <button class="btn btn-primary" type="button" id="trackOrderBtn">TRACK →</button>
+        </div>
+
+        <div class="track-message" id="trackMessage"></div>
+
+        <div class="track-result" id="trackResult">
+            <div class="track-top">
+                <div>
+                    <div style="font-family:'IBM Plex Mono';font-size:10px;color:var(--grease);">ORDER NUMBER</div>
+                    <div class="track-order-number" id="trackOrderNumber">#KL-00000</div>
+                </div>
+                <div class="track-status" id="trackStatus">PENDING</div>
+            </div>
+
+            <div class="track-meta">
+                <div class="track-meta-box">
+                    <span>Customer</span>
+                    <strong id="trackCustomer">-</strong>
+                </div>
+                <div class="track-meta-box">
+                    <span>Order Type</span>
+                    <strong id="trackType">-</strong>
+                </div>
+                <div class="track-meta-box">
+                    <span>Total</span>
+                    <strong id="trackTotal">₱0</strong>
+                </div>
+            </div>
+
+            <div class="track-timeline" id="trackTimeline"></div>
+
+            <button class="cancel-order-btn" id="cancelOrderBtn" type="button">
+                CANCEL THIS ORDER
+            </button>
+        </div>
+    </section>
+
+
+    <!-- =========================
+     CONFIRMATION
+========================= -->
+
+    <div class="confirmation" id="confirmation">
+
+        <div class="confirmation-box">
+
+            <div class="confirmation-icon">
+                ✓
+            </div>
+
+            <h2>
+                ORDER PLACED
+            </h2>
+
+            <div class="order-number" id="orderNumber">
+                #KL-00000
+            </div>
+
+            <!-- ITEMIZED RECEIPT -->
+            <div class="confirmation-items">
+                <div class="confirmation-items-title">// ITEMS ORDERED</div>
+                <div id="confirmItems"></div>
+            </div>
+
+            <div class="confirmation-details">
+
+                <div class="confirmation-row">
+
+                    <span>
+                        Customer
+                    </span>
+
+                    <strong id="confirmName">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="confirmation-row">
+
+                    <span>
+                        Order Type
+                    </span>
+
+                    <strong id="confirmType">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="confirmation-row">
+
+                    <span>
+                        Payment
+                    </span>
+
+                    <strong id="confirmPayment">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="confirmation-row" id="confirmRequestRow" style="display:none;">
+
+                    <span>
+                        Request
+                    </span>
+
+                    <strong id="confirmRequest">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="confirmation-row">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong id="confirmTotal">
+                        ₱0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <p class="footer-text" style="color:var(--grease); margin-bottom:20px;">
+                Please keep your order number for reference.
+            </p>
+
+
+            <button class="btn btn-primary" onclick="closeConfirmation()">
+                DONE
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+     FOOTER
+========================= -->
+
+    <footer>
+
+        <div>
+
+            <div class="footer-brand">1860 CAFE JOVELICIOUS</div>
+
+            <div class="footer-text">
+                RESTAURANT ORDERING SYSTEM<br>
+                DINE-IN • TAKEOUT • PICK-UP
+            </div>
+
+        </div>
+
+
+        <div class="footer-right">
+
+            OPEN DAILY<br>
+            10:00 AM — 9:00 PM<br><br>
+
+            GOOD FOOD. EASY ORDERING.
+
+        </div>
+
+    </footer>
+
+
+    <div class="option-modal" id="optionModal">
+        <div class="option-modal-box">
+            <h3 id="optionModalTitle">Choose Options</h3>
+            <div class="option-modal-sub">Select your preferred options.</div>
+            <div id="optionModalBody"></div>
+            <div class="option-modal-actions">
+                <button class="btn btn-secondary" type="button" onclick="closeOptionModal()">CANCEL</button>
+                <button class="btn btn-primary" type="button" onclick="confirmMenuOptions()">ADD TO CART</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+
+        /* ==========================================
+           FIREBASE SETUP
+        ========================================== */
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            getDocs,
+            setDoc,
+            onSnapshot,
+            writeBatch,
+            runTransaction,
+            addDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC2jG_9iFsEA0rxQNo7TWPGnR41uFfSt8",
+            authDomain: "food-7a5b7.firebaseapp.com",
+            projectId: "food-7a5b7",
+            storageBucket: "food-7a5b7.firebasestorage.app",
+            messagingSenderId: "865570771892",
+            appId: "1:865570771892:web:1497ff11d0bae06c7718e1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const MENU_COLLECTION = "menu";
+        const INGREDIENTS_COLLECTION = "ingredients";
+        const HISTORY_COLLECTION = "stockHistory";
+        const LOW_STOCK_THRESHOLD_DEFAULT = 10;
+
+
+        const DEFAULT_INGREDIENT_STOCK = [
+            { id: "beef-tapa", name: "Beef tapa", category: "Meat", stock: 25, unit: "pcs", threshold: 5 },
+            { id: "bangus", name: "Bangus", category: "Fish", stock: 25, unit: "pcs", threshold: 5 },
+            { id: "beef-patty", name: "Beef patty", category: "Meat", stock: 20, unit: "pcs", threshold: 5 },
+            { id: "chicken-fillet", name: "Chicken fillet", category: "Meat", stock: 30, unit: "pcs", threshold: 5 },
+            { id: "burger-bun", name: "Burger bun", category: "Bakery", stock: 30, unit: "pcs", threshold: 10 },
+            { id: "lettuce", name: "Lettuce", category: "Vegetables", stock: 20, unit: "pcs", threshold: 5 },
+            { id: "tomato", name: "Tomato", category: "Vegetables", stock: 20, unit: "pcs", threshold: 5 },
+            { id: "onion", name: "Onion", category: "Vegetables", stock: 20, unit: "pcs", threshold: 5 },
+            { id: "cheese", name: "Cheese", category: "Dairy", stock: 25, unit: "slices", threshold: 5 },
+            { id: "garlic-rice", name: "Garlic rice", category: "Rice", stock: 40, unit: "servings", threshold: 10 },
+            { id: "fried-egg", name: "Fried egg", category: "Eggs", stock: 40, unit: "pcs", threshold: 10 },
+            { id: "coffee", name: "Coffee", category: "Coffee", stock: 50, unit: "servings", threshold: 10 },
+            { id: "milk", name: "Milk", category: "Dairy", stock: 30, unit: "liters", threshold: 5 },
+            { id: "sugar", name: "Sugar", category: "Ingredients", stock: 10, unit: "kg", threshold: 2 },
+            { id: "caramel-syrup", name: "Caramel Syrup", category: "Coffee", stock: 10, unit: "bottles", threshold: 2 },
+            { id: "chocolate-syrup", name: "Chocolate Syrup", category: "Coffee", stock: 10, unit: "bottles", threshold: 2 },
+            { id: "whipped-cream", name: "Whipped Cream", category: "Dairy", stock: 10, unit: "bottles", threshold: 2 },
+            { id: "water", name: "Water", category: "Drinks", stock: 100, unit: "liters", threshold: 20 },
+            { id: "ice", name: "Ice", category: "Drinks", stock: 30, unit: "kg", threshold: 5 },
+            { id: "potatoes", name: "Potatoes", category: "Vegetables", stock: 40, unit: "kg", threshold: 10 },
+            { id: "cooking-oil", name: "Cooking Oil", category: "Cooking", stock: 20, unit: "liters", threshold: 5 },
+            { id: "salt", name: "Salt", category: "Seasoning", stock: 5, unit: "kg", threshold: 1 },
+            { id: "seasoning", name: "Seasoning", category: "Seasoning", stock: 5, unit: "kg", threshold: 1 },
+            { id: "cheese-sauce", name: "Cheese Sauce", category: "Dairy", stock: 10, unit: "bottles", threshold: 2 },
+            { id: "bbq-seasoning", name: "BBQ Seasoning", category: "Seasoning", stock: 5, unit: "kg", threshold: 1 },
+            { id: "sour-cream-seasoning", name: "Sour Cream Seasoning", category: "Seasoning", stock: 5, unit: "kg", threshold: 1 },
+            { id: "tortilla-chips", name: "Tortilla Chips", category: "Snacks", stock: 30, unit: "packs", threshold: 5 },
+            { id: "ground-beef", name: "Ground Beef", category: "Meat", stock: 15, unit: "kg", threshold: 3 },
+            { id: "jalapeno", name: "Jalapeño", category: "Vegetables", stock: 3, unit: "kg", threshold: 1 },
+            { id: "soy-sauce", name: "Soy Sauce", category: "Condiments", stock: 5, unit: "bottles", threshold: 1 },
+            { id: "garlic", name: "Garlic", category: "Seasoning", stock: 5, unit: "kg", threshold: 1 },
+            { id: "pepper", name: "Pepper", category: "Seasoning", stock: 3, unit: "kg", threshold: 1 }
+        ];
+        // R(pangalan ng ingredient, quantity kada 1 serving). Ang unit ay ayon sa unit sa inventory.
+        const R = (name, quantity = 1) => ({ name, quantity });
+        const FRIES = [R("Potatoes", 0.15), R("cooking oil", 0.1), R("salt", 0.002)]; // kg, liters, kg
+        const FLAVOR_INGREDIENTS = {
+            "Cheese": [R("cheese sauce", 0.02)],
+            "BBQ": [R("bbq seasoning", 0.02)],
+            "Sour Cream": [R("sour cream seasoning", 0.02)]
+        };
+
+        const DEFAULT_INGREDIENTS = {
+            "tapsilog": [R("Beef tapa"), R("garlic rice"), R("fried egg"), R("soy sauce", 0.02), R("garlic", 0.005), R("pepper", 0.001)],
+            "bangsilog": [R("Bangus"), R("garlic rice"), R("fried egg"), R("garlic", 0.005), R("cooking oil", 0.03), R("pepper", 0.001)],
+            "bacsilog": [R("Bacon"), R("garlic rice"), R("fried egg"), R("cooking oil", 0.03)],
+            "tosilog": [R("Tocino"), R("garlic rice"), R("fried egg"), R("cooking oil", 0.03)],
+            "beef burger": [R("Beef patty"), R("burger bun"), R("lettuce", 0.25), R("tomato", 0.25), R("onion", 0.25), R("cheese"), R("mayonnaise", 0.02)],
+            "beef burger with fries": [R("Beef patty"), R("burger bun"), R("lettuce", 0.25), R("tomato", 0.25), R("onion", 0.25), R("cheese"), R("mayonnaise", 0.02), ...FRIES],
+            "chicken sandwich with fries": [R("Chicken fillet"), R("burger bun"), R("lettuce", 0.25), R("tomato", 0.25), R("mayonnaise", 0.02), ...FRIES],
+            "iced americano": [R("Coffee"), R("water", 0.25), R("ice", 0.15)],
+            "spanish latte": [R("Coffee"), R("Milk", 0.2), R("Sugar", 0.02), R("ice", 0.15)],
+            "caramel latte": [R("Coffee"), R("Milk", 0.2), R("Caramel Syrup", 0.03), R("Sugar", 0.01), R("ice", 0.15)],
+            "caramel macchiato": [R("Coffee"), R("Milk", 0.2), R("Caramel Syrup", 0.03), R("Sugar", 0.01), R("ice", 0.15)],
+            "coffee frappe salted caramel": [R("Coffee"), R("Milk", 0.2), R("Caramel Syrup", 0.05), R("Sugar", 0.02), R("ice", 0.2), R("Whipped Cream", 0.05)],
+            "java frappuccino": [R("Coffee"), R("Milk", 0.2), R("Chocolate Syrup", 0.05), R("Sugar", 0.02), R("ice", 0.2), R("Whipped Cream", 0.05)],
+            "french fries": [...FRIES],
+            "nachos": [R("Tortilla Chips"), R("cheese sauce", 0.1), R("ground beef", 0.08), R("tomato", 0.25), R("onion", 0.25), R("jalapeño", 0.01)]
+        };
+        const ingredientId = name => String(name || "")
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+        const normalizeRecipe = item => {
+            const raw = item.ingredients;
+            const list = Array.isArray(raw) ? raw
+                : (raw && typeof raw === "object") ? Object.values(raw)
+                    : (typeof raw === "string" && raw.trim()) ? raw.split(",").map(s => s.trim()).filter(Boolean)
+                        : [];
+            return list.filter(Boolean).map(x =>
+                typeof x === "string"
+                    ? ({ ingredientId: ingredientId(x), name: x, quantity: 1 })
+                    : ({ ...x, ingredientId: x.ingredientId || ingredientId(x.name), quantity: Number(x.quantity ?? 1) })
+            );
+        };
+        async function initIngredients() {
+            // CUSTOMER PAGE: READ-ONLY. Ingredient creation/updates are handled by admin.html.
+            return true;
+            /*
+            const snap = await getDocs(collection(db, INGREDIENTS_COLLECTION));
+            const existing = new Set(snap.docs.map(d => d.id));
+            const batch = writeBatch(db); let writes = 0;
+            const seeded = new Map(DEFAULT_INGREDIENT_STOCK.map(x => [x.id, x]));
+            Object.values(DEFAULT_INGREDIENTS).flat().forEach(name => {
+                const id = ingredientId(name);
+                if (!seeded.has(id)) seeded.set(id, { id, name, category: "Ingredients", stock: 30, unit: "units", threshold: 5 });
+            });
+            seeded.forEach(x => { if (!existing.has(x.id)) { const { id, ...data } = x; batch.set(doc(db, INGREDIENTS_COLLECTION, id), data); writes++; } });
+            if (writes) await batch.commit();
+            */
+        }
+        const SEED_MENU_ITEMS = [
+            { id: "tapsilog", name: "Tapsilog", category: "Meals", price: 120, emoji: "🥩", description: "Beef tapa served with garlic rice and fried egg.", ingredients: DEFAULT_INGREDIENTS["tapsilog"], stock: 25, threshold: 10, available: true },
+            { id: "bangsilog", name: "Bangsilog", category: "Meals", price: 120, emoji: "🐟", description: "Fried bangus served with garlic rice and fried egg.", ingredients: DEFAULT_INGREDIENTS["bangsilog"], stock: 25, threshold: 10, available: true },
+            { id: "bacsilog", name: "Bacsilog", category: "Meals", price: 95, emoji: "🥓", description: "Bacon served with garlic rice and fried egg.", ingredients: DEFAULT_INGREDIENTS["bacsilog"], stock: 25, threshold: 10, available: true },
+            { id: "tosilog", name: "Tosilog", category: "Meals", price: 85, emoji: "🥓", description: "Tocino served with garlic rice and fried egg.", ingredients: DEFAULT_INGREDIENTS["tosilog"], stock: 25, threshold: 10, available: true },
+            { id: "beef-burger", name: "Beef Burger", category: "Burgers", price: 99, emoji: "🍔", description: "Juicy beef patty with fresh vegetables and cheese.", ingredients: DEFAULT_INGREDIENTS["beef burger"], stock: 20, threshold: 10, available: true },
+            { id: "beef-burger-with-fries", name: "Beef Burger with Fries", category: "Burgers", price: 65, emoji: "🍔🍟", description: "Beef burger served with crispy fries.", ingredients: DEFAULT_INGREDIENTS["beef burger with fries"], stock: 20, threshold: 10, available: true },
+            { id: "chicken-sandwich-with-fries", name: "Chicken Sandwich with Fries", category: "Burgers", price: 75, emoji: "🍗🍟", description: "Chicken sandwich served with crispy fries.", ingredients: DEFAULT_INGREDIENTS["chicken sandwich with fries"], stock: 20, threshold: 10, available: true },
+            { id: "iced-americano", name: "Iced Americano", category: "Drinks", price: 49, sizes: { Midi: 49, Maxi: 59 }, emoji: "🧊☕", description: "Bold iced coffee with a clean, refreshing finish.", ingredients: DEFAULT_INGREDIENTS["iced americano"], stock: 30, threshold: 10, available: true },
+            { id: "spanish-latte", name: "Spanish Latte", category: "Drinks", price: 59, sizes: { Midi: 59, Maxi: 69 }, emoji: "🥛☕", description: "Creamy coffee with sweet milk.", ingredients: DEFAULT_INGREDIENTS["spanish latte"], stock: 30, threshold: 10, available: true },
+            { id: "caramel-latte", name: "Caramel Latte", category: "Drinks", price: 59, sizes: { Midi: 59, Maxi: 69 }, emoji: "🍮☕", description: "Smooth latte with caramel sweetness.", ingredients: DEFAULT_INGREDIENTS["caramel latte"], stock: 30, threshold: 10, available: true },
+            { id: "caramel-macchiato", name: "Caramel Macchiato", category: "Drinks", price: 79, sizes: { Midi: 79, Maxi: 89 }, emoji: "☕", description: "Rich coffee, milk and caramel.", ingredients: DEFAULT_INGREDIENTS["caramel macchiato"], stock: 30, threshold: 10, available: true },
+            { id: "coffee-frappe-salted-caramel", name: "Coffee Frappe Salted Caramel", category: "Drinks", price: 119, sizes: { Midi: 119, Maxi: 139 }, emoji: "🥤☕", description: "Blended coffee frappe with salted caramel.", ingredients: DEFAULT_INGREDIENTS["coffee frappe salted caramel"], stock: 25, threshold: 10, available: true },
+            { id: "java-frappuccino", name: "Java Frappuccino", category: "Drinks", price: 119, sizes: { Midi: 119, Maxi: 139 }, emoji: "🍫☕", description: "Blended coffee with chocolate and whipped cream.", ingredients: DEFAULT_INGREDIENTS["java frappuccino"], stock: 25, threshold: 10, available: true },
+            { id: "french-fries", name: "French Fries", category: "Snacks", price: 65, emoji: "🍟", description: "Golden crispy fries. Choose Cheese, BBQ or Sour Cream.", flavors: ["Cheese", "BBQ", "Sour Cream"], ingredients: DEFAULT_INGREDIENTS["french fries"], stock: 40, threshold: 10, available: true },
+            { id: "nachos", name: "Nachos", category: "Snacks", price: 85, emoji: "🌮", description: "Crunchy nachos with cheese and tasty toppings.", ingredients: DEFAULT_INGREDIENTS["nachos"], stock: 25, threshold: 10, available: true }
+        ];
+        async function syncRequestedMenuChanges() {
+            const removeIds = ["iced-tea", "soft-drinks", "halo-halo"];
+            const snap = await getDocs(collection(db, MENU_COLLECTION));
+            const existing = new Set(snap.docs.map(d => d.id));
+            const batch = writeBatch(db); let writes = 0;
+            removeIds.forEach(id => { if (existing.has(id)) { batch.delete(doc(db, MENU_COLLECTION, id)); writes++; } });
+            for (const item of SEED_MENU_ITEMS) {
+                if (!existing.has(item.id) || ["iced-americano", "spanish-latte", "caramel-latte", "caramel-macchiato", "coffee-frappe-salted-caramel", "java-frappuccino", "bacsilog", "tosilog", "beef-burger-with-fries", "chicken-sandwich-with-fries", "french-fries"].includes(item.id)) { batch.set(doc(db, MENU_COLLECTION, item.id), item, { merge: true }); writes++; }
+            }
+            if (writes) await batch.commit();
+        }
+
+
+        /* ==========================================
+           MENU — live from Firestore, shared with admin
+        ========================================== */
+
+        let menuCache = {};   // { id: {name, category, price, description, image, emoji, stock, threshold, available} }
+        let menuReady = false;
+        let currentCategory = "All";
+        let ingredientCache = {};   // { ingredientId: {name, stock, unit, ...} }
+
+
+        async function initMenu() {
+            // CUSTOMER PAGE: READ-ONLY. Menu creation/updates/deletes are handled by admin.html.
+            const snap = await getDocs(collection(db, MENU_COLLECTION));
+            if (snap.empty) {
+                console.warn("Menu collection is empty. Please initialize the menu from admin.html.");
+            }
+            return true;
+        }
+        function getIngredients(data) {
+            const raw = data.ingredients;
+            const stored = Array.isArray(raw) ? raw
+                : (raw && typeof raw === "object") ? Object.values(raw)
+                    : [];
+
+            // Kung may quantity na (object) ang naka-save na recipe, gamitin iyon
+            if (stored.some(x => x && typeof x === "object")) return stored;
+
+            // Kung string lang (luma) o wala, gamitin ang default na may quantity
+            const key = (data.name || "").trim().toLowerCase();
+            return DEFAULT_INGREDIENTS[key] || stored;
+        }
+
+        function listenToIngredients() {
+            onSnapshot(collection(db, INGREDIENTS_COLLECTION), snapshot => {
+                const map = {};
+                snapshot.forEach(d => { map[d.id] = d.data(); });
+                ingredientCache = map;
+
+                renderMenu(currentCategory);
+                renderCart();
+            }, err => {
+                console.error("Ingredient sync error:", err);
+            });
+        }
+
+        function listenToMenu() {
+            onSnapshot(collection(db, MENU_COLLECTION), snapshot => {
+                const map = {};
+                snapshot.forEach(d => {
+                    const data = d.data();
+                    const ingredients = getIngredients(data);
+                    map[d.id] = { ...data, ingredients: Array.isArray(ingredients) ? ingredients : [] };
+                });
+                menuCache = map;
+                menuReady = true;
+                renderCategoryBar();
+                renderMenu(currentCategory);
+                renderCart();
+
+                function renderCategoryBar() {
+                    const bar = document.getElementById("categoryBar");
+
+                    const categories = Array.from(
+                        new Set(Object.values(menuCache).map(item => item.category || "Uncategorized"))
+                    ).sort((a, b) => a.localeCompare(b));
+
+                    if (!categories.includes(currentCategory) && currentCategory !== "All") {
+                        currentCategory = "All";
+                    }
+
+                    bar.innerHTML = "";
+                    ["All", ...categories].forEach(cat => {
+                        const btn = document.createElement("button");
+                        btn.className = "category-btn" + (currentCategory === cat ? " active" : "");
+                        btn.textContent = cat;
+                        btn.addEventListener("click", () => filterMenu(cat, btn));
+                        bar.appendChild(btn);
+                    });
+                }
+                renderMenu(currentCategory);
+                renderCart(); // refresh cart in case prices/availability changed live
+            }, err => {
+                console.error("Menu sync error:", err);
+            });
+        }
+
+        function getMenuItem(id) {
+            return menuCache[String(id)] || null;
+        }
+
+        function getStockFor(id, flavor = null) {
+            const entry = getMenuItem(id);
+            if (!entry) return 0;
+
+            const recipe = normalizeRecipe(entry);
+            const extra = (flavor && FLAVOR_INGREDIENTS[flavor]) ? FLAVOR_INGREDIENTS[flavor] : [];
+            const combined = recipe.concat(extra);
+
+            if (!combined.length) return Number(entry.stock || 0);
+
+            let servings = Infinity;
+            for (const r of combined) {
+                const ing = ingredientCache[r.ingredientId || ingredientId(r.name)];
+                const have = ing ? Number(ing.stock || 0) : 0;
+                const need = Number(r.quantity) > 0 ? Number(r.quantity) : 1;
+                servings = Math.min(servings, Math.floor(have / need + 1e-9));
+            }
+            return Number.isFinite(servings) ? servings : 0;
+        }
+
+        // bagong helper: para sa badge ng card (walang napiling flavor pa)
+        function getEffectiveStock(item) {
+            if (Array.isArray(item.flavors) && item.flavors.length) {
+                return Math.max(0, ...item.flavors.map(f => getStockFor(item.id ?? item.__id, f)));
+            }
+            return getStockFor(item.id ?? item.__id);
+        }
+
+
+        /* ==========================================
+           CART
+        ========================================== */
+
+        let cart = [];
+
+
+        /* ==========================================
+           FORMAT PRICE
+        ========================================== */
+
+        function formatPrice(price) {
+            return "₱" + price.toLocaleString("en-PH");
+        }
+
+
+        /* ==========================================
+           CATEGORY BAR (built from live menu data,
+           so it always matches whatever categories
+           the admin has created)
+        ========================================== */
+
+        function renderCategoryBar() {
+            const bar = document.getElementById("categoryBar");
+
+            const categories = Array.from(
+                new Set(Object.values(menuCache).map(item => item.category || "Uncategorized"))
+            ).sort((a, b) => a.localeCompare(b));
+
+            if (!categories.includes(currentCategory) && currentCategory !== "All") {
+                currentCategory = "All";
+            }
+
+            bar.innerHTML = `<button class="category-btn ${currentCategory === 'All' ? 'active' : ''}" onclick="filterMenu('All', this)">All</button>` +
+                categories.map(cat =>
+                    `<button class="category-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterMenu('${cat}', this)">${cat}</button>`
+                ).join("");
+        }
+
+
+        /* ==========================================
+           RENDER MENU
+        ========================================== */
+
+        function renderMenu(category = "All") {
+
+            const menuGrid = document.getElementById("menuGrid");
+
+            if (!menuReady) {
+                menuGrid.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--grease);">
+                        LOADING MENU…
+                    </div>
+                `;
+                return;
+            }
+
+            let items = Object.entries(menuCache).map(([id, data]) => ({ id, ...data }));
+
+            if (category !== "All") {
+                items = items.filter(item => (item.category || "Uncategorized") === category);
+            }
+
+            items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+            if (items.length === 0) {
+                menuGrid.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--grease);">
+                        NO ITEMS IN THIS CATEGORY YET.
+                    </div>
+                `;
+                return;
+            }
+
+            menuGrid.innerHTML = items.map(item => {
+
+                const stockLeft = Array.isArray(item.flavors) && item.flavors.length
+                    ? Math.max(0, ...item.flavors.map(f => getStockFor(item.id, f)))
+                    : getStockFor(item.id);
+                const threshold = item.threshold ?? LOW_STOCK_THRESHOLD_DEFAULT;
+                const manuallyUnavailable = item.available === false;
+                const isOut = manuallyUnavailable || stockLeft <= 0;
+                const isLow = !isOut && stockLeft <= threshold;
+
+                let badgeClass = "stock-badge";
+                let badgeText = "IN STOCK";
+
+                if (manuallyUnavailable) {
+                    badgeClass += " out";
+                    badgeText = "UNAVAILABLE";
+                } else if (stockLeft <= 0) {
+                    badgeClass += " out";
+                    badgeText = "OUT OF STOCK";
+                } else if (isLow) {
+                    badgeClass += " low";
+                    badgeText = "LOW STOCK";
+                }
+
+                const visual = item.image
+                    ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;">`
+                    : (item.emoji || "🍽️");
+
+                const sizeText = item.sizes
+                    ? Object.entries(item.sizes).map(([size, price]) => `${size} ${formatPrice(Number(price))}`).join(" • ")
+                    : formatPrice(Number(item.price || 0));
+                const optionHint = item.sizes ? "SELECT SIZE" : (Array.isArray(item.flavors) && item.flavors.length ? "SELECT FLAVOR" : "+ ADD");
+
+                return `
+        <div class="food-card ${isOut ? 'out-of-stock' : ''}">
+            <div class="food-image">${visual}<span class="${badgeClass}">${badgeText}</span></div>
+            <div class="food-info">
+                <div class="food-category">${item.category || "Uncategorized"}</div>
+                <div class="food-name">${item.name}</div>
+                <div class="food-description">${item.description || ""}</div>
+                <div class="food-bottom">
+                    <div class="food-price" style="font-size:${item.sizes ? '18px' : '25px'};">${sizeText}</div>
+                    <button class="add-btn" onclick="addToCart('${item.id}')" ${isOut ? 'disabled' : ''}>${isOut ? 'SOLD OUT' : optionHint}</button>
+                </div>
+            </div>
+        </div>`;
+            }).join("");
+
+        }
+
+
+        /* ==========================================
+           FILTER MENU
+        ========================================== */
+
+        function filterMenu(category, button) {
+
+            currentCategory = category;
+
+            document.querySelectorAll(".category-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            if (button) button.classList.add("active");
+
+            renderMenu(category);
+
+        }
+
+
+        /* ==========================================
+           ADD TO CART
+        ========================================== */
+
+        let pendingMenuSelection = null;
+
+        function addConfiguredItem(id, options = {}) {
+            const item = getMenuItem(id);
+            if (!item) return;
+            const size = options.size || null, flavor = options.flavor || null;
+            const stockLeft = getStockFor(id, flavor);
+            const price = size && item.sizes ? Number(item.sizes[size]) : Number(item.price || 0);
+            const cartKey = [id, size || "", flavor || ""].join("|");
+            const existing = cart.find(ci => ci.cartKey === cartKey);
+            const currentInCart = existing ? existing.quantity : 0;
+            if (currentInCart + 1 > stockLeft) {
+                alert("Sorry, only " + stockLeft + " left in stock for " + item.name + (flavor ? " (" + flavor + ")" : "") + ".");
+                return;
+            }
+            const displayName = item.name + (size ? " — " + size : "") + (flavor ? " — " + flavor : "");
+            if (existing) existing.quantity++;
+            else cart.push({ cartKey, id, name: displayName, baseName: item.name, price, quantity: 1, size, flavor });
+            renderCart();
+            document.getElementById("order").scrollIntoView({ behavior: "smooth" });
+        }
+
+        function addToCart(id) {
+            const item = getMenuItem(id);
+            if (!item) return;
+            if (item.available === false) { alert("Sorry, " + item.name + " is currently unavailable."); return; }
+            if ((item.sizes && Object.keys(item.sizes).length) || (Array.isArray(item.flavors) && item.flavors.length)) {
+                openOptionModal(id); return;
+            }
+            addConfiguredItem(id);
+        }
+
+        function openOptionModal(id) {
+            const item = getMenuItem(id);
+            if (!item) return;
+            pendingMenuSelection = { id, size: null, flavor: null };
+            document.getElementById("optionModalTitle").textContent = item.name;
+            let html = "";
+            if (item.sizes && Object.keys(item.sizes).length) {
+                html += `<div class="option-group"><span class="option-group-label">SIZE</span><div class="option-buttons">` +
+                    Object.entries(item.sizes).map(([size, price]) => `<button type="button" class="option-btn" onclick="selectMenuSize('${size}',this)">${size}<br><strong>${formatPrice(Number(price))}</strong></button>`).join("") +
+                    `</div></div>`;
+            }
+            if (Array.isArray(item.flavors) && item.flavors.length) {
+                html += `<div class="option-group"><span class="option-group-label">FLAVOR</span><div class="option-buttons">` +
+                    item.flavors.map(flavor => {
+                        const stock = getStockFor(id, flavor);
+                        const out = stock <= 0;
+                        return `<button type="button" class="option-btn" ${out ? "disabled" : ""} onclick="selectMenuFlavor('${flavor}',this)">
+                    ${flavor}${out ? "<br><small>SOLD OUT</small>" : ""}
+                </button>`;
+                    }).join("") +
+                    `</div></div>`;
+            }
+            document.getElementById("optionModalBody").innerHTML = html;
+            document.getElementById("optionModal").classList.add("show");
+        }
+        function selectMenuSize(size, button) { if (!pendingMenuSelection) return; pendingMenuSelection.size = size; button.parentElement.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected")); button.classList.add("selected"); }
+        function selectMenuFlavor(flavor, button) { if (!pendingMenuSelection) return; pendingMenuSelection.flavor = flavor; button.parentElement.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected")); button.classList.add("selected"); }
+        function closeOptionModal() { pendingMenuSelection = null; document.getElementById("optionModal").classList.remove("show"); }
+        function confirmMenuOptions() {
+            if (!pendingMenuSelection) return;
+            const item = getMenuItem(pendingMenuSelection.id);
+            if (item.sizes && Object.keys(item.sizes).length && !pendingMenuSelection.size) { alert("Please select a size."); return; }
+            if (Array.isArray(item.flavors) && item.flavors.length && !pendingMenuSelection.flavor) { alert("Please select a flavor."); return; }
+            const selected = { ...pendingMenuSelection }; closeOptionModal(); addConfiguredItem(selected.id, selected);
+        }
+        window.addToCart = addToCart; window.closeOptionModal = closeOptionModal; window.confirmMenuOptions = confirmMenuOptions;
+        window.selectMenuSize = selectMenuSize; window.selectMenuFlavor = selectMenuFlavor;
+
+
+        /* ==========================================
+           UPDATE QUANTITY
+        ========================================== */
+
+        function updateQuantity(cartKey, change) {
+            const item = cart.find(ci => ci.cartKey === cartKey);
+            if (!item) return;
+
+            if (change > 0) {
+                const stockLeft = getStockFor(item.id, item.flavor);
+                if (item.quantity + 1 > stockLeft) {
+                    alert("Sorry, only " + stockLeft + " left in stock for " + item.name + ".");
+                    return;
+                }
+            }
+
+            item.quantity += change;
+            if (item.quantity <= 0) cart = cart.filter(ci => ci.cartKey !== cartKey);
+            renderCart();
+        }
+
+
+        /* ==========================================
+           REMOVE ITEM
+        ========================================== */
+
+        function removeItem(cartKey) {
+            cart = cart.filter(ci => ci.cartKey !== cartKey);
+            renderCart();
+        }
+
+
+        /* ==========================================
+           GET TOTAL / COUNT
+        ========================================== */
+
+        function getTotal() {
+            return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+        }
+
+        function getCartCount() {
+            return cart.reduce((total, item) => total + item.quantity, 0);
+        }
+
+
+        /* ==========================================
+           RENDER CART
+        ========================================== */
+
+        function renderCart() {
+
+            const cartItems = document.getElementById("cartItems");
+            const cartCount = document.getElementById("cartCount");
+            const cartTotal = document.getElementById("cartTotal");
+
+            cartCount.textContent = getCartCount();
+            cartTotal.textContent = formatPrice(getTotal());
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+            <div class="empty-cart">
+                YOUR CART IS EMPTY.<br>
+                ADD SOMETHING DELICIOUS.
+            </div>
+        `;
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+
+        <div class="cart-item">
+
+            <div>
+                <div class="cart-name">${item.name}</div>
+                <div class="cart-price">${formatPrice(item.price)} each</div>
+            </div>
+
+            <div class="quantity">
+                <button class="qty-btn" onclick="updateQuantity('${item.cartKey}', -1)">−</button>
+                <strong>${item.quantity}</strong>
+                <button class="qty-btn" onclick="updateQuantity('${item.cartKey}', 1)">+</button>
+            </div>
+
+            <div>
+                <strong>${formatPrice(item.price * item.quantity)}</strong>
+                <br>
+                <button class="remove-btn" onclick="removeItem('${item.cartKey}')">REMOVE</button>
+            </div>
+
+        </div>
+
+    `).join("");
+
+        }
+
+
+        /* ==========================================
+           ORDER TYPE
+        ========================================== */
+
+        document.querySelectorAll('input[name="orderType"]').forEach(input => {
+            input.addEventListener("change", function () {
+                const tableGroup = document.getElementById("tableGroup");
+                tableGroup.style.display = this.value === "Dine-in" ? "block" : "none";
+            });
+        });
+
+
+        /* ==========================================
+           PLACE ORDER
+        ========================================== */
+
+        async function placeOrder() {
+
+            if (cart.length === 0) {
+                alert("Please add at least one item to your cart.");
+                return;
+            }
+
+            const customerName = document.getElementById("customerName").value.trim();
+
+            if (!customerName) {
+                alert("Please enter your name.");
+                document.getElementById("customerName").focus();
+                return;
+            }
+
+            const orderType = document.querySelector('input[name="orderType"]:checked').value;
+            const payment = "Cash";
+            const table = document.getElementById("tableNumber").value;
+            const request = document.getElementById("orderRequest").value.trim();
+
+            if (orderType === "Dine-in" && !table) {
+                alert("Please select your table number.");
+                return;
+            }
+            const summary = cart
+                .map(i => "• " + i.name + " × " + i.quantity + " — " + formatPrice(i.price * i.quantity))
+                .join("\n");
+
+            const okToPlace = confirm(
+                "Place this order?\n\n" +
+                summary +
+                "\n\nTotal: " + formatPrice(getTotal()) +
+                "\nName: " + customerName +
+                "\nType: " + orderType + (orderType === "Dine-in" ? " — " + table : "") +
+                (request ? "\nRequest: " + request : "") +
+                "\n\nNote: your order number will not be saved on this device, so please write it down or take a screenshot."
+            );
+
+            if (!okToPlace) return;
+            const placeBtn = document.querySelector(".place-order");
+            placeBtn.disabled = true;
+            placeBtn.textContent = "PLACING ORDER...";
+
+            // Build the total ingredients required by the whole cart. Each menu
+            // item keeps its recipe, while actual stock lives in /ingredients.
+            const required = {};
+            for (const cartItem of cart) {
+                const menuItem = getMenuItem(cartItem.id);
+                if (!menuItem || menuItem.available === false) { alert("Sorry, " + cartItem.name + " is no longer available."); return; }
+                normalizeRecipe(menuItem).forEach(r => {
+                    const id = r.ingredientId || ingredientId(r.name);
+                    required[id] = Number(((required[id] || 0) + Number(r.quantity || 1) * cartItem.quantity).toFixed(4));
+                });
+                if (cartItem.flavor && FLAVOR_INGREDIENTS[cartItem.flavor]) {
+                    FLAVOR_INGREDIENTS[cartItem.flavor].forEach(r => {
+                        const id = r.ingredientId || ingredientId(r.name);
+                        required[id] = Number(((required[id] || 0) + Number(r.quantity || 1) * cartItem.quantity).toFixed(4));
+                    });
+                }
+            }
+
+            const orderNumber = "KL-" + Array.from(crypto.getRandomValues(new Uint32Array(2)))
+                .map(n => n.toString(36).toUpperCase().padStart(7, "0"))
+                .join("")
+                .slice(0, 8);
+            const total = getTotal();
+            const now = new Date();
+            const order = {
+                orderNumber,
+                customerName,
+                orderType,
+                table: orderType === "Dine-in" ? table : null,
+                payment,
+                request: request || null,
+                items: cart,
+                total,
+                status: "Pending",
+                date: now.toLocaleString(),
+                dateISO: now.toISOString(),
+                ingredientUsage: required,
+                statusUpdatedAt: now.toISOString()
+            };
+
+            // Snapshot the items BEFORE the cart gets cleared, so the
+            // confirmation receipt can still show exactly what was ordered.
+            const orderedItems = cart.map(item => ({ ...item }));
+
+            try {
+                await runTransaction(db, async (tx) => {
+                    const entries = Object.entries(required);
+
+                    const refs = entries.map(([id]) =>
+                        doc(db, INGREDIENTS_COLLECTION, id)
+                    );
+
+                    const snaps = await Promise.all(
+                        refs.map(ref => tx.get(ref))
+                    );
+
+                    for (let i = 0; i < snaps.length; i++) {
+                        const snap = snaps[i];
+                        const [, qty] = entries[i];
+
+                        if (!snap.exists()) {
+                            throw new Error("Missing ingredient: " + entries[i][0]);
+                        }
+
+                        const data = snap.data();
+                        const current = Number(data.stock || 0);
+
+                        if (current < qty) {
+                            throw new Error(
+                                (data.name || entries[i][0]) +
+                                " only has " +
+                                current +
+                                " " +
+                                (data.unit || "units") +
+                                " left."
+                            );
+                        }
+                    }
+
+                    // Update ingredient stocks
+                    for (let i = 0; i < snaps.length; i++) {
+                        const [, qty] = entries[i];
+                        const current = Number(snaps[i].data().stock || 0);
+
+                        tx.update(refs[i], {
+                            stock: Number((current - qty).toFixed(4))
+                        });
+                    }
+
+                    // Save order
+                    tx.set(
+                        doc(db, "orders", orderNumber),
+                        order
+                    );
+                });
+
+                await Promise.all(Object.entries(required).map(([id, quantity]) => addDoc(collection(db, HISTORY_COLLECTION), { itemId: id, itemName: id, type: "Out", quantity, note: "Used for order #" + orderNumber, dateISO: new Date().toISOString() })));
+            } catch (err) {
+                console.error("Order save failed:", err);
+                alert("Something went wrong saving your order. Please check your connection and try again.");
+                placeBtn.disabled = false;
+                placeBtn.textContent = "PLACE ORDER →";
+                return;
+            }
+
+            /* CONFIRMATION */
+
+            document.getElementById("orderNumber").textContent = "#" + orderNumber;
+
+            document.getElementById("confirmItems").innerHTML = orderedItems.map(item => `
+                <div class="confirmation-item-row">
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>${formatPrice(item.price * item.quantity)}</span>
+                </div>
+            `).join("");
+
+            document.getElementById("confirmName").textContent = customerName;
+            document.getElementById("confirmType").textContent =
+                orderType + (orderType === "Dine-in" ? " — " + table : "");
+            document.getElementById("confirmPayment").textContent = payment;
+
+            const confirmRequestRow = document.getElementById("confirmRequestRow");
+            if (request) {
+                document.getElementById("confirmRequest").textContent = request;
+                confirmRequestRow.style.display = "flex";
+            } else {
+                confirmRequestRow.style.display = "none";
+            }
+
+            document.getElementById("confirmTotal").textContent = formatPrice(total);
+            document.getElementById("confirmation").classList.add("show");
+
+            /* CLEAR CART */
+
+            /* CLEAR CART */
+
+            cart = [];
+            renderCart();
+            document.getElementById("customerName").value = "";
+            document.getElementById("orderRequest").value = "";
+
+            placeBtn.disabled = false;
+            placeBtn.textContent = "PLACE ORDER →";
+
+        }
+
+
+
+        /* ==========================================
+           LIVE ORDER TRACKING + CUSTOMER CANCELLATION
+        ========================================== */
+
+        let trackedOrderUnsubscribe = null;
+        let trackedOrderNumber = null;
+        let trackedOrderData = null;
+
+        const TRACK_STEPS = [
+            { key: "Pending", title: "Order received", desc: "Your order has been received by 1860 Cafe Jovelicious." },
+            { key: "Preparing", title: "Preparing", desc: "The kitchen is preparing your order." },
+            { key: "Ready", title: "Ready for pickup / serving", desc: "Your order is ready." },
+            { key: "Completed", title: "Completed", desc: "Order completed. Thank you!" }
+        ];
+
+        function formatTrackTime(value) {
+            if (!value) return "";
+            try {
+                const d = new Date(value);
+                if (Number.isNaN(d.getTime())) return "";
+                return d.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+            } catch {
+                return "";
+            }
+        }
+
+        function normalizeOrderStatus(status) {
+            return String(status || "Pending").trim();
+        }
+
+        function showTrackMessage(message) {
+            const el = document.getElementById("trackMessage");
+            el.textContent = message;
+            el.classList.add("show");
+        }
+
+        function hideTrackMessage() {
+            document.getElementById("trackMessage").classList.remove("show");
+        }
+
+        function renderTrackedOrder(data) {
+            trackedOrderData = data || {};
+            const status = normalizeOrderStatus(trackedOrderData.status);
+
+            document.getElementById("trackResult").classList.add("show");
+            document.getElementById("trackOrderNumber").textContent = "#" + (trackedOrderData.orderNumber || trackedOrderNumber);
+            document.getElementById("trackCustomer").textContent = trackedOrderData.customerName || "-";
+            document.getElementById("trackType").textContent =
+                (trackedOrderData.orderType || "-") +
+                (trackedOrderData.orderType === "Dine-in" && trackedOrderData.table ? " — " + trackedOrderData.table : "");
+            document.getElementById("trackTotal").textContent = formatPrice(Number(trackedOrderData.total || 0));
+
+            const statusEl = document.getElementById("trackStatus");
+            statusEl.textContent = status.toUpperCase();
+            statusEl.classList.toggle("cancelled", status.toLowerCase() === "cancelled");
+
+            const timeline = document.getElementById("trackTimeline");
+
+            if (status.toLowerCase() === "cancelled") {
+                timeline.innerHTML = `
+                    <div class="track-step cancelled-step done">
+                        <div class="track-dot"></div>
+                        <div>
+                            <div class="track-step-title">Order Cancelled</div>
+                            <div class="track-step-time">
+                                ${formatTrackTime(trackedOrderData.cancelledAt || trackedOrderData.statusUpdatedAt) || "Cancelled"}
+                            </div>
+                            <div style="color:var(--grease);font-size:12px;margin-top:5px;">
+                                ${trackedOrderData.cancelledBy === "customer"
+                        ? "Cancelled by customer."
+                        : "This order was cancelled."}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const currentIndex = TRACK_STEPS.findIndex(x => x.key.toLowerCase() === status.toLowerCase());
+                const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+
+                timeline.innerHTML = TRACK_STEPS.map((step, index) => {
+                    const done = index <= safeIndex;
+                    const active = index === safeIndex;
+                    const isCurrent = status.toLowerCase() === step.key.toLowerCase();
+
+                    return `
+                        <div class="track-step ${done ? "done" : ""} ${active ? "active" : ""}">
+                            <div class="track-dot"></div>
+                            <div>
+                                <div class="track-step-title">${step.title}</div>
+                                <div class="track-step-time">
+                                    ${isCurrent
+                            ? (formatTrackTime(trackedOrderData.statusUpdatedAt) || "Current status")
+                            : (index < safeIndex ? "Completed" : "Waiting")}
+                                </div>
+                                <div style="color:var(--grease);font-size:12px;margin-top:5px;">${step.desc}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            const cancelBtn = document.getElementById("cancelOrderBtn");
+            const cancellable = status.toLowerCase() === "pending";
+            cancelBtn.disabled = !cancellable;
+            cancelBtn.textContent = cancellable ? "CANCEL THIS ORDER" : "ORDER CANNOT BE CANCELLED";
+        }
+
+        function normalizeNameForCompare(value) {
+            return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+        }
+
+        async function trackOrder() {
+            const input = document.getElementById("trackOrderInput");
+            const nameInput = document.getElementById("trackNameInput");
+            const orderNumber = input.value.trim().toUpperCase();
+            const enteredName = nameInput.value.trim();
+
+            hideTrackMessage();
+
+            if (!orderNumber) {
+                input.focus();
+                return;
+            }
+
+            if (!enteredName) {
+                showTrackMessage("Please enter the name used on the order too.");
+                nameInput.focus();
+                return;
+            }
+
+            if (trackedOrderUnsubscribe) {
+                trackedOrderUnsubscribe();
+                trackedOrderUnsubscribe = null;
+            }
+
+            const expectedName = normalizeNameForCompare(enteredName);
+
+            try {
+                const orderRef = doc(db, "orders", orderNumber);
+
+                trackedOrderUnsubscribe = onSnapshot(orderRef, (snap) => {
+                    if (!snap.exists()) {
+                        document.getElementById("trackResult").classList.remove("show");
+                        showTrackMessage("ORDER NOT FOUND. Please check your order number and name.");
+                        return;
+                    }
+
+                    const data = snap.data();
+
+                    // Both the order number AND the customer name must match.
+                    // Same "not found" message on mismatch so a stranger can't
+                    // tell whether the order number was right but the name was wrong.
+                    if (normalizeNameForCompare(data.customerName) !== expectedName) {
+                        document.getElementById("trackResult").classList.remove("show");
+                        showTrackMessage("ORDER NOT FOUND. Please check your order number and name.");
+                        return;
+                    }
+
+                    trackedOrderNumber = orderNumber;
+                    hideTrackMessage();
+                    renderTrackedOrder(data);
+                }, (error) => {
+                    console.error("Order tracking failed:", error);
+                    document.getElementById("trackResult").classList.remove("show");
+                    showTrackMessage("Unable to load this order. Please check your Firebase rules.");
+                });
+
+                document.getElementById("track").scrollIntoView({ behavior: "smooth", block: "start" });
+                input.value = "";
+                nameInput.value = "";
+            } catch (error) {
+                console.error("Track order error:", error);
+                showTrackMessage("Unable to track this order right now.");
+            }
+        }
+
+        async function cancelTrackedOrder() {
+            if (!trackedOrderNumber || !trackedOrderData) return;
+
+            const status = normalizeOrderStatus(trackedOrderData.status).toLowerCase();
+            if (status !== "pending") {
+                alert("This order can no longer be cancelled.");
+                return;
+            }
+
+            const confirmed = confirm(
+                "Cancel order #" + trackedOrderNumber + "?\n\nThe staff will see that this order was cancelled and can restore the stock."
+            );
+
+            if (!confirmed) return;
+
+            try {
+                const orderRef = doc(db, "orders", trackedOrderNumber);
+
+                await runTransaction(db, async (tx) => {
+                    const snap = await tx.get(orderRef);
+
+                    if (!snap.exists()) {
+                        throw new Error("Order not found.");
+                    }
+
+                    const current = snap.data();
+                    const currentStatus = normalizeOrderStatus(current.status).toLowerCase();
+
+                    if (!["pending", "preparing"].includes(currentStatus)) {
+                        throw new Error("This order can no longer be cancelled.");
+                    }
+
+                    // Customer cancellation ONLY changes the order status.
+                    // Stock restoration is intentionally handled by staff/admin
+                    // so an anonymous customer cannot increase inventory.
+                    const now = new Date().toISOString();
+                    tx.update(orderRef, {
+                        status: "Cancelled",
+                        cancelledBy: "customer",
+                        cancelledAt: now,
+                        statusUpdatedAt: now,
+                        stockRestored: false
+                    });
+                });
+
+                showTrackMessage("ORDER CANCELLED. Staff can now see the cancellation in the order queue.");
+            } catch (error) {
+                console.error("Cancel order failed:", error);
+                alert(error.message || "Unable to cancel this order. Please try again.");
+            }
+        }
+
+        document.getElementById("trackOrderBtn").addEventListener("click", trackOrder);
+
+        document.getElementById("trackOrderInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                trackOrder();
+            }
+        });
+
+        document.getElementById("trackNameInput").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                trackOrder();
+            }
+        });
+
+        document.getElementById("cancelOrderBtn").addEventListener("click", cancelTrackedOrder);
+
+        /* ==========================================
+           CLOSE CONFIRMATION
+        ========================================== */
+
+        function closeConfirmation() {
+            document.getElementById("confirmation").classList.remove("show");
+        }
+
+
+        /* ==========================================
+           MOBILE NAV
+        ========================================== */
+
+        document.getElementById("menuBtn").addEventListener("click", () => {
+            document.getElementById("navLinks").classList.toggle("show");
+        });
+
+
+        /* ==========================================
+           EXPOSE TO INLINE onclick HANDLERS
+           (functions inside a module script are not
+           global by default, so the HTML's onclick="..."
+           attributes need these on window)
+        ========================================== */
+
+        window.filterMenu = filterMenu;
+        window.addToCart = addToCart;
+        window.updateQuantity = updateQuantity;
+        window.removeItem = removeItem;
+        window.placeOrder = placeOrder;
+        window.closeConfirmation = closeConfirmation;
+
+
+
+        // The order number and name are intentionally NOT remembered/prefilled.
+        // This device may be shared by multiple customers.
+        // Also clear values saved by older versions of this page.
+        localStorage.removeItem("klientelaLastOrder");
+        localStorage.removeItem("klientelaLastOrderName");
+
+        /* ==========================================
+           INITIALIZE
+        ========================================== */
+
+        renderCart();
+
+        initIngredients()
+            .then(initMenu)
+            .then(listenToMenu)
+            .then(listenToIngredients)
+            .catch(err => {
+                console.error("Menu init failed:", err);
+                document.getElementById("menuGrid").innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--rust);">
+                        COULDN'T CONNECT TO THE MENU DATABASE.<br>
+                        CHECK YOUR FIREBASE SETUP / INTERNET CONNECTION.
+                    </div>
+                `;
+            });
+
+    </script>
+
+</body>
+
+</html>
